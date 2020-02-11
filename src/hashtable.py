@@ -90,7 +90,7 @@ class HashTable:
         '''
         for i in self.storage:
             if i == key:
-            hashed = hashlib.sha256(key).hexdigest() #this is where you left off
+            hashed = hashlib.sha256(key).hexdigest() #this is where you left off 
 
 
     def resize(self):
