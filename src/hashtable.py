@@ -33,9 +33,6 @@ class HashTable:
 
         OPTIONAL STRETCH: Research and implement DJB2
         '''
-
-        hash = 5381
-        #TODO
         pass
 
 
@@ -44,12 +41,6 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         within the storage capacity of the hash table.
         '''
-        count = 0
-        for i in range(self.capacity+1):
-            if key == i:
-                return count
-            else:
-                count+=1
 
         return self._hash(key) % self.capacity
 
@@ -62,9 +53,14 @@ class HashTable:
 
         Fill this in.
         '''
-        for i in self.storage:
-            if key:
-                self.insert[value]
+        #This is using the custom method to run this function, if there is a security breach, this will help so you can change only the custom method and it will change the rest dynamically. Use _hash_mod rather than built in hash(key)
+        # index = hash(key) & self.capacity #these two are the same
+        index = self._hash_mod(key)
+        if self.storage[index] is not None:
+            print(f"WARNING: COLLISION AT {index}")
+        else:
+            self.storage[index]=(key, value) #use Tuple to store both key and value
+            return
 
 
 
@@ -77,8 +73,14 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
-
+        index = self._hash_mod(key)
+        if self.storage[index] is not None:
+            if self.storage[index][0] == key:
+                self.storage[index] == None
+            else:
+                print(f"WARNING COLLISION AT {index}")
+        else:
+            print(f"WARNING KEY {key} NOT FOUND")
 
     def retrieve(self, key):
         '''
@@ -88,9 +90,15 @@ class HashTable:
 
         Fill this in.
         '''
-        for i in self.storage:
-            if i == key:
-            hashed = hashlib.sha256(key).hexdigest() #this is where you left off 
+        index = self._hash_mod(key)
+        if self.storage[index] is not None:
+            if self.storage[index][0] == key:
+                return self.storage[index][1] #1 IS THE VALUE 0 IS THE KEY
+            else:
+                print(f"WARNING COLLISION AT {index}")
+                return None
+        else:
+            print(f"WARNING KEY {key} NOT FOUND")
 
 
     def resize(self):
@@ -100,6 +108,14 @@ class HashTable:
 
         Fill this in.
         '''
+
+        old_storage = self.storage
+        self.capacity *= 2 #This doubles
+        self.storage = [None] * self.capacity #re-initialized
+
+        for i in old_storage:
+            self.insert(i[0], i[1]) #insert key and value in new storage. Insert will add this to self.storage which was set to [None] by this method. 
+
         pass
 
 
