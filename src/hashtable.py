@@ -14,7 +14,7 @@ class HashTable:
     '''
     def __init__(self, capacity):
         self.capacity = capacity  # Number of buckets in the hash table
-        self.storage = [None] * capacity
+        self.storage = [None] * capacity #number of "items in the array" basically, [None, None, None, None] for a cap of 4
 
 
     def _hash(self, key):
@@ -23,7 +23,8 @@ class HashTable:
 
         You may replace the Python hash with DJB2 as a stretch goal.
         '''
-        return hash(key)
+        print("_hash")
+        print(hash(key) % 8) #this could be a different number
 
 
     def _hash_djb2(self, key):
@@ -32,6 +33,9 @@ class HashTable:
 
         OPTIONAL STRETCH: Research and implement DJB2
         '''
+
+        hash = 5381
+        #TODO
         pass
 
 
@@ -40,6 +44,13 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         within the storage capacity of the hash table.
         '''
+        count = 0
+        for i in range(self.capacity+1):
+            if key == i:
+                return count
+            else:
+                count+=1
+
         return self._hash(key) % self.capacity
 
 
@@ -51,7 +62,10 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        for i in self.storage:
+            if key:
+                self.insert[value]
+
 
 
 
@@ -74,7 +88,9 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        for i in self.storage:
+            if i == key:
+            hashed = hashlib.sha256(key).hexdigest() #this is where you left off
 
 
     def resize(self):
