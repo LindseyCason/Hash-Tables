@@ -49,62 +49,73 @@ class HashTable:
 
 
     def insert(self, key, value):
-        '''
-        Store the value with the given key.
-
-        Hash collisions should be handled with Linked List Chaining.
-
-        Fill this in.
-        '''
-        #This is using the private method to run this function, if there is a security breach, this will help so you can change only the custom method and it will change the rest dynamically. Use _hash_mod rather than built in hash(key)
-        # index = hash(key) & self.capacity #these two are the same
-        index = self._hash_mod(key) #creates an index
-        print("index initial****",index)
-        if self.storage[index] is not None: #check to see if index is empty (should be), if not, print a collision warning
-            print(f"WARNING: COLLISION AT {index}")
-           
-            index=index+ 1
-            print("index after add****")
-        else:#if it is empty, it's available for use. Store the key,value pair at the index because it is available. see below
-            self.storage[index]=(key, value) #use Tuple to store both key and value
-            return
-
+        if self.storage[self._hash_mod(key)] != None: #IF THERE IS SOMETHING THERE
+            current = self.storage[self._hash_mod(key)]#SET CURRENT TO THE NODE
+            while current: #WHILE A NODE EXISTS
+                if current.key == key: #IF THE KEY MATCHES
+                    current.value = value #REASSIGN THE VALUE
+                    break
+                if current.next != None: #IF AT THE END OF THE LINE...
+                    current = current.next #SET CURRENT TO NOW BE THE NEXT NODE AFTER CURRENT
+                else:
+                    break
+            current.next = LinkedPair(key, value)#IF NO NODE AT NEXT, INSERT LINKED PAIR
+        else:
+            self.storage[self._hash_mod(key)] = LinkedPair(key, value) #IF NO NODES EXIST AT ALL, INSERT NODE AS LINKED PAIR
 
 
     def remove(self, key):
-        '''
-        Remove the value stored with the given key.
-
-        Print a warning if the key is not found.
-
-        Fill this in.
-        '''
-        index = self._hash_mod(key) #get index for that key again
-        if self.storage[index] is not None: #if it's not empty (if something is in there)
-            if self.storage[index][0] == key: #the 0 element in the tuple(key,value) is the key, 1 element is value
-                self.storage[index] == None #reset the info at that index to None which is removing the key,value pair
-            else:
-                index= index+ 1
-                print(f"WARNING COLLISION AT {index}")
+        # index = self._hash_mod(key) #get index for that key again
+        if self.storage[self._hash_mod(key)] != None:#IF A NODE EXISTS
+            previous=None
+            current = self.storage[self._hash_mod(key)] #SET CURRENT TO THE NODE
+            next = current.next
+            while True: #while above is NOT NONE
+                if current.key == key: #IF THE CURRENT.KEY MATCHES THE KEY
+                    if previous != None and next != None: #IF THE NODE IS IN THE MIDDLE OF THE BUNCH
+                        previous.next = next #Set the next node after the previous node to the NEXT node, eliminating the current node
+                        break
+                    if previous == None and next != None: #IF THE NODE IS AT THE HEAD AND THERE IS A NEXT NODE...
+                        self.storage[self._hash_mod(key)] = next #SET THE CURRENT NODE TO THE "NEXT" NODE ELIMINATING NODE
+                        break
+                    if previous == None and next == None:#IF THERE IS NO PREVIOUS AND THERE IS NO NEXT, JUST A STAND ALONE NODE
+                        self.storage[self._hash_mod(key)] = None#SET THAT NODE TO NONE
+                        break
+                    if previous != None and next == None: #IF THERE IS A PREVIOUS AND NO NEXT, IT'S AT THE TAIL END
+                        previous.next = None #SET THE NEXT TO THE PREVIOUS, TO NONE
+                        break
+                elif current.next != None: #IF THE KEY DOESN'T MATCH, MOVE THE NODES IN THE ORDER BELOW AND RETRY
+                    previous=current
+                    current=current.next
+                    next=current.next
+            else: #IF WE'RE OUT OF THINGS TO CHECK AND NO KEY MATCHED
+                print(f"WARNING KEY {key} NOT FOUND")
         else:
             print(f"WARNING KEY {key} NOT FOUND")
 
-    def retrieve(self, key): #this is the same as get
-        '''
-        Retrieve the value stored with the given key.
 
-        Returns None if the key is not found.
 
-        Fill this in.
-        '''
-        index = self._hash_mod(key) #get the index of the key again
-        if self.storage[index] is not None: #if it's not empty
-            if self.storage[index][0] == key: #they 0 element is the key and the 1 element is the value
-                return self.storage[index][1] #return the value, because we are retrieving (getting).
-            else:
-                index= index+1
+
+
+
+
+    def retrieve(self, key):
+        if self.storage[self._hash_mod(key)] != None: #IF THE SPOT YOU'RE AT IS NOT EMPTY
+            current = self.storage[self._hash_mod(key)] #SET THAT SPOT TO CURRENT
+            while True: #WHILE THERE IS A CURRENT ASSIGNED (NOT NONE)
+                if current.key == key: #IF THE KEY OF THE CURRENT MATCHES THE KEY PASSED IN
+                    return current.value #RETURN THE VALUE THAT BELONGS TO THAT KEY
+                elif current.next != None: #IF YOU'RE AT THE END OF THE STORAGE
+                    current=current.next #SET THE CURRENT TO THE NEXT NODE AND KEEP TRYING
+                else:
+                    return None #IF ALL ELSE FAILS
         else:
             print(f"WARNING KEY {key} NOT FOUND")
+            return None
+
+
+
+
 
 
     def resize(self):
@@ -115,15 +126,17 @@ class HashTable:
         Fill this in.
         '''
 
-        old_storage = self.storage #set old storage to the current storage that we are about to reset, this saves it in old_storage
-        self.capacity *= 2 #This doubles the capicity
-        self.storage = [None] * self.capacity #re-initialized the storage with now double space. THEN below, we will add our old storage back into the newly doubled storage.
-        # print(type(old_storage))
-        for i in old_storage:
-            # print(i[0], i[1])
-            self.insert(i[0], i[1]) #insert key and value in new storage. Insert will add this to self.storage which was set to [None] by this method. 
-        # print("new storage",self.storage)
-
+        old_storage = self.storage #SET THE CURRENT STORAGE TO THE OLD STORAGE VARIABLE TO SAVE IT FOR LATER, WE'LL BE PUTTING THIS BACK INTO THE NEW STORAGE ONCE IT'S RESIZED
+        self.capacity *= 2 #DOUBLING THE CAPICITY
+        self.storage = [None] * self.capacity #REINITIALIZED THE STORAGE WITH THE NEW SIZE STORAGE.
+        for item in old_storage:#FOR EVERY ITEM IN OLD_STORAGE
+            if item !=None: #AS LONG AS THAT ITEM != NONE
+                current = item #SET NON-NONE ITEM TO CURRENT
+                while current:#WHILE A CURRENT IS ASSIGNED...
+                    self.insert(current.key, current.value) #INSERT KEY AND VALUE OF OLD STORAGE TO NEW STORAGE. Insert will add this to self.storage which was set to [None] by this method. 
+                    current = current.next#THEN SENT CURRENT TO THE NEXT ITEM, IF IT'S NOT NONE AND REPEAT
+        print("new storage", self.storage)
+        print("old storage", old_storage)
 
 if __name__ == "__main__":
     ht = HashTable(2)
