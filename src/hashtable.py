@@ -13,7 +13,7 @@ class HashTable:
     that accepts string keys
     '''
     def __init__(self, capacity):
-        self.capacity = capacity  # Number of buckets in the hash table
+        self.capacity = capacity  # Number of buckets/items/spaces in the hash table
         self.storage = [None] * capacity #number of "items in the array" basically, [None, None, None, None] for a cap of 4
 
 
@@ -23,9 +23,9 @@ class HashTable:
 
         You may replace the Python hash with DJB2 as a stretch goal.
         '''
-
+        return hash(key) #this(SELF.CAPACITY) needs to be the length of the array or the capacity so the index will not be outside the array indexs
         #HERE WE ARE JUST USING THIS _HASH AS A PRIVATE METHOD IN CASE SOMETHING WAS TO CHANGE ABOUT THE BUILT IN METHOD HASH LATER DOWN THE ROAD, WE COULD UPDATE THIS IN ONE SPOT AND THE CHANGES WOULD TAKE EFFECT THROUGHOUT.
-        print(hash(key) % self.capacity) #this(SELF.CAPACITY) needs to be the length of the array or the capacity so the index will not be outside the array indexs
+
 
 
     def _hash_djb2(self, key):
@@ -43,6 +43,7 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         within the storage capacity of the hash table.
         '''
+        #THIS IS THE USING THE ABOVE PRIVATE _HASH AND RETURNING THE MODULUS OFTHE HASH TO BE USED AS AN INDEX LATER
 
         return self._hash(key) % self.capacity
 
