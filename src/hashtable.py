@@ -59,11 +59,17 @@ class HashTable:
         #This is using the private method to run this function, if there is a security breach, this will help so you can change only the custom method and it will change the rest dynamically. Use _hash_mod rather than built in hash(key)
         # index = hash(key) & self.capacity #these two are the same
         index = self._hash_mod(key) #creates an index
+        print("index initial****",index)
         if self.storage[index] is not None: #check to see if index is empty (should be), if not, print a collision warning
             print(f"WARNING: COLLISION AT {index}")
+           
+            index=index+ 1
+            print("index after add****")
         else:#if it is empty, it's available for use. Store the key,value pair at the index because it is available. see below
             self.storage[index]=(key, value) #use Tuple to store both key and value
             return
+
+
 
     def remove(self, key):
         '''
@@ -78,6 +84,7 @@ class HashTable:
             if self.storage[index][0] == key: #the 0 element in the tuple(key,value) is the key, 1 element is value
                 self.storage[index] == None #reset the info at that index to None which is removing the key,value pair
             else:
+                index= index+ 1
                 print(f"WARNING COLLISION AT {index}")
         else:
             print(f"WARNING KEY {key} NOT FOUND")
@@ -95,7 +102,7 @@ class HashTable:
             if self.storage[index][0] == key: #they 0 element is the key and the 1 element is the value
                 return self.storage[index][1] #return the value, because we are retrieving (getting).
             else:
-                return None
+                index= index+1
         else:
             print(f"WARNING KEY {key} NOT FOUND")
 
@@ -111,10 +118,11 @@ class HashTable:
         old_storage = self.storage #set old storage to the current storage that we are about to reset, this saves it in old_storage
         self.capacity *= 2 #This doubles the capicity
         self.storage = [None] * self.capacity #re-initialized the storage with now double space. THEN below, we will add our old storage back into the newly doubled storage.
-
+        # print(type(old_storage))
         for i in old_storage:
+            # print(i[0], i[1])
             self.insert(i[0], i[1]) #insert key and value in new storage. Insert will add this to self.storage which was set to [None] by this method. 
-
+        # print("new storage",self.storage)
 
 
 if __name__ == "__main__":
